@@ -11,6 +11,8 @@ import { db, storage } from "../firebase";
 import Nweet from "../components/Nweet";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const Home = ({ userObj }) => {
   const [nweet, setNweet] = React.useState("");
@@ -19,7 +21,6 @@ const Home = ({ userObj }) => {
   const getNweets = async () => {
     const querySnapshot = await getDocs(collection(db, "nweets"));
     querySnapshot.forEach((document) => {
-      console.log(document.data());
       const nweetObject = {
         ...document.data(),
         id: document.id,
@@ -41,6 +42,9 @@ const Home = ({ userObj }) => {
     );
   }, []);
   const onSubmit = async (event) => {
+    if (nweet === "") {
+      return;
+    }
     event.preventDefault();
     let attachmentUrl = "";
     if (attachment !== "") {
@@ -59,7 +63,6 @@ const Home = ({ userObj }) => {
     };
     try {
       const docRef = await addDoc(collection(db, "nweets"), nweetObj);
-      console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -77,7 +80,6 @@ const Home = ({ userObj }) => {
     reader.onloadend = (finishedEvent) => {
       const result = finishedEvent.currentTarget.result;
       setAttachment(result);
-      console.log(attachment);
     };
     reader.readAsDataURL(theFile);
   };
@@ -85,25 +87,49 @@ const Home = ({ userObj }) => {
     setAttachment("");
   };
   return (
-    <>
-      <form onSubmit={onSubmit}>
+    <div className="container">
+      <form onSubmit={onSubmit} className="factoryForm">
+        <div className="factoryInput__container">
+          <input
+            className="factoryInput__input"
+            value={nweet}
+            onChange={onChange}
+            type="text"
+            placeholder="What's on your mind?"
+            maxLength={120}
+          />
+          <input type="submit" value="&rarr;" className="factoryInput__arrow" />
+        </div>
+        <label for="attach-file" className="factoryInput__label">
+          <span>Add photos</span>
+          <FontAwesomeIcon icon={faPlus} />
+        </label>
         <input
-          type="text"
-          value={nweet}
-          onChange={onChange}
-          placeholder="What's on your mind?"
-          maxLength={120}
+          id="attach-file"
+          type="file"
+          accept="image/*"
+          onChange={onFileChange}
+          style={{
+            opacity: 0,
+          }}
         />
-        <input type="file" accept="image/*" onChange={onFileChange} />
-        <input type="submit" value="Nweet" />
         {attachment && (
-          <div>
-            <img src={attachment} width="50px" height="50px" />
-            <button onClick={onClearPhotoClick}>Clear</button>
+          <div className="factoryForm__attachment">
+            <img
+              src={attachment}
+              style={{
+                backgroundImage: attachment,
+              }}
+              alt="img"
+            />
+            <div className="factoryForm__clear" onClick={onClearPhotoClick}>
+              <span>Remove</span>
+              <FontAwesomeIcon icon={faTimes} />
+            </div>
           </div>
         )}
       </form>
-      <div>
+      <div style={{ marginTop: 30 }}>
         {nweets.map((item) => (
           <Nweet
             key={item.id}
@@ -112,7 +138,7 @@ const Home = ({ userObj }) => {
           />
         ))}
       </div>
-    </>
+    </div>
   );
 };
 

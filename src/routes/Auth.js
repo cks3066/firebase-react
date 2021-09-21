@@ -7,7 +7,12 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
 } from "firebase/auth";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTwitter,
+  faGoogle,
+  faGithub,
+} from "@fortawesome/free-brands-svg-icons";
 const Auth = () => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -32,7 +37,6 @@ const Auth = () => {
       } else {
         data = await signInWithEmailAndPassword(auth, email, password);
       }
-      console.log(data);
     } catch (error) {
       setError(error.message);
     }
@@ -48,16 +52,20 @@ const Auth = () => {
       provider = new GithubAuthProvider();
     }
     signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
-      })
+      .then((result) => {})
       .catch((error) => {
         setError(error.message);
       });
   };
   return (
-    <div>
-      <form onSubmit={onSubmit}>
+    <div className="authContainer">
+      <FontAwesomeIcon
+        icon={faTwitter}
+        color={"#04AAFF"}
+        size="3x"
+        style={{ marginBottom: 30 }}
+      />
+      <form onSubmit={onSubmit} className="container">
         <input
           name="email"
           type="text"
@@ -65,6 +73,7 @@ const Auth = () => {
           required
           value={email}
           onChange={onChange}
+          className="authInput"
         />
         <input
           name="password"
@@ -73,19 +82,24 @@ const Auth = () => {
           required
           value={password}
           onChange={onChange}
+          className="authInput"
         />
-        <input type="submit" value={newAccount ? "Create Account" : "Log In"} />
-        {error}
+        <input
+          type="submit"
+          value={newAccount ? "Create Account" : "Log In"}
+          className="authInput authSubmit"
+        />
+        {error && <span className="authError">{error}</span>}
       </form>
-      <span onClick={toggleAccount}>
+      <span onClick={toggleAccount} className="authSwitch">
         {newAccount ? "Sign In" : "Cretate Account"}
       </span>
-      <div>
-        <button onClick={onSocialClick} name="google">
-          Continue with Google
+      <div className="authBtns">
+        <button onClick={onSocialClick} name="google" className="authBtn">
+          Continue with Google <FontAwesomeIcon icon={faGoogle} />
         </button>
-        <button onClick={onSocialClick} name="github">
-          Continue with Github
+        <button onClick={onSocialClick} name="github" className="authBtn">
+          Continue with Github <FontAwesomeIcon icon={faGithub} />
         </button>
       </div>
     </div>
